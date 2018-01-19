@@ -22,6 +22,8 @@ function createUI() {
   });
   screen.append(createLeftUI());
   screen.append(createRightUI());
+  screen.append(createAlertUI());
+  screen.append(createLoadingUI());
   screen.render();
   events.on("update", function(){
     screen.render();
@@ -48,13 +50,11 @@ function createLeftUI(){
   });
   var pkgs = {};
   var textItems;
-  box.on("click", function(){
-    box.focus();
-  });
   box.on("select item", function(item){
     var pkg = pkgs[item.content];
     events.emit("select", pkg);
   });
+  // navigate key bindings
   box.key("abcdefghijklmnopqrstuvwxyz".split(""), function(ch, key){
     if(!textItems) { return; }
     var hit = false;
@@ -66,8 +66,8 @@ function createLeftUI(){
       }
     });
   });
-  box.key(["home", "end", "left", "up", "right", "down"], function(ch){
-    switch(ch) {
+  box.key(["home", "end", "left", "up", "right", "down"], function(ch, key){
+    switch(key.name) {
       case "home":
         box.select(0);
         break;
@@ -84,11 +84,39 @@ function createLeftUI(){
         break;
     }
   });
-  box.key(["space"], function(ch, key){
+  box.key(["tab", "space"], function(ch, key){
     box.down();
   });
-  box.key(["S-space"], function(){
+  box.key(["S-tab", "S-space"], function(){
     box.up()
+  });
+  // remove
+  box.key("backspace", function(){
+    var package = box.getItem(box.selected);
+    var name = package.content;
+    var msg = "Are you sure you want to remove `" + name + "` ?";
+    events.emit("alert", msg, function(result){
+      if(result) {
+        removePackage(name).then(function(){
+          pkgs[name].installed = false;
+          // TODO: change item's fg
+        });
+      }
+    });
+  });
+  // install
+  box.key("enter", function(){
+    var package = box.getItem(box.selected);
+    var name = package.content;
+    var msg = "Are you sure you want to install `" + name + "` ?";
+    events.emit("alert", msg, function(result){
+      if(result) {
+        installPackage(name).then(function(){
+          pkgs[name].installed = true;
+          // TODO: change item's fg
+        });
+      }
+    });
   });
   listPackages().then(function(buf){
     var items = [];
@@ -121,52 +149,6 @@ function createRightUI(){
       border: {fg: "yellow"}
     }
   });
-  box.on("click", function(){
-    box.focus();
-  });
-  var installBtn = blessed.Button({
-    parent: box,
-    top: 1,
-    left: 1,
-    mouse: true,
-    content: " install ",
-    shrink: true,
-    style: {
-      fg: "white",
-      bg: "green",
-      underline: false,
-      focus: {
-        underline: true
-      }
-    }
-  });
-  installBtn.on("press", function(){
-    console.log("pkg install", currentPkg.name);
-  });
-  var removeBtn = blessed.Button({
-    parent: box,
-    top: 1,
-    left: 10,
-    mouse: true,
-    content: " remove ",
-    shrink: true,
-    style: {
-      fg: "white",
-      bg: "red",
-      underline: false,
-      focus: {
-        underline: true
-      }
-    }
-  });
-  removeBtn.on("press", function(){
-    console.log("pkg uninstall", currentPkg.name);
-  });
-  var textPanel = blessed.Text({
-    parent: box,
-    top: 3,
-    left: 0
-  });
   var currentPkg;
   events.on("select", function(pkg){
     if(pkg === currentPkg) {
@@ -185,14 +167,7 @@ function createRightUI(){
         }
         return field + ": " + value;
       }).join("\n");
-      textPanel.setContent(info);
-      if(pkg.installed) {
-        installBtn.hide();
-        removeBtn.show();
-      } else {
-        installBtn.show();
-        removeBtn.hide();
-      }
+      box.setContent(info);
       events.emit("update");
     });
     currentPkg = pkg;
@@ -241,4 +216,72 @@ function parsePackageInfo(info) {
     arch: arch,
     installed: props.indexOf("installed") > -1
   };
+}
+
+function createAlertUI(){
+  var box = blessed.Question({
+    shrink: true,
+    top: "center",
+    left: "center",
+    border: {type: "line"},
+    style: {
+      shadow: true,
+      fg: "white",
+      bg: "magenta"
+    }
+  });
+  box.key("esc", function(){
+    box.hide();
+    events.emit("update");
+  });
+  events.on("alert", function(msg, callback){
+    box.ask(msg, function(error, result){
+      box.hide();
+      events.emit("update");
+      callback(result);
+    });
+    box.focus();
+    events.emit("update");
+  });
+  return box;
+}
+
+function createLoadingUI(){
+  var box = blessed.Loading({
+    shrink: true,
+    top: "center",
+    left: "center",
+    border: {type: "line"},
+    style: {
+      shadow: true,
+      fg: "white",
+      bg: "magenta"
+    }
+  });
+  box.hide();
+  events.on("loading", function(text){
+    box.load(text);
+  });
+  events.on("stop-loading", function(){
+    box.stop();
+  });
+  return box;
+}
+
+function removePackage(name){
+  events.emit("loading", "removing package: " + name);
+  return getCommandOutput("apt remove " + name).then(function(){
+    events.emit("stop-loading");
+  }, function(){
+    events.emit("stop-loading");
+  });
+}
+
+function installPackage(name){
+  events.emit("loading", "installing package: " + name);
+  return getCommandOutput("apt install " + name).then(function(){
+    events.emit("stop-loading");
+  }, function(){
+    events.emit("stop-loading");
+  });
 }
