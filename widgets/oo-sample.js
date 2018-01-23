@@ -17,6 +17,6 @@ function Sample(options) {
 
 Sample.prototype.__proto__ = Element.prototype;
 
-Sample.prototype.type = 'sample';
+Sample.prototype.type = "sample";
 
 module.exports = Sample;

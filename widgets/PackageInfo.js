@@ -22,7 +22,7 @@ PackageInfo.prototype.showPackage = function(pkg){
 
 PackageInfo.prototype.__proto__ = Element.prototype;
 
-PackageInfo.prototype.type = 'packageinfo';
+PackageInfo.prototype.type = "packageinfo";
 
 module.exports = PackageInfo;
 

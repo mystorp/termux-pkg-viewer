@@ -1,4 +1,3 @@
-var child_process = require("child_process");
 var chalk = require("chalk");
 var blessed = require("blessed");
 
@@ -17,7 +16,7 @@ function createUI() {
       shape: "block",
       blink: true
     },
-		fullUnicode: true,
+    fullUnicode: true,
     title: "termux package viewer"
   });
   screen.key("C-q", function(){
@@ -37,7 +36,7 @@ function createUI() {
     style: {
       border: {fg: "yellow"},
       item: {fg: "green"},
-      selected: {fg: "white", bg: "magenta"},
+      selected: {fg: "white", bg: "magenta"}
     }
   });
   var rightui = new PackageInfo({

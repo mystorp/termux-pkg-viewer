@@ -33,7 +33,7 @@ ConfirmModal.prototype._patch = function(){
   var okBtn = self._.okay;
   var cancelBtn = self._.cancel;
   var screen = self.screen;
-	okBtn.position.left = "50%-8";
+  okBtn.position.left = "50%-8";
   okBtn.position.top += 1;
   okBtn.style.fg = "black";
   okBtn.style.bg = "white";
@@ -41,19 +41,19 @@ ConfirmModal.prototype._patch = function(){
   screen.setEffects(okBtn, okBtn, "focus", "blur", {
     fg: "white",
     bg: "blue",
-		bold: true
+    bold: true
   }, "focusEffects", "_ftemp");
 
   cancelBtn.align = "center";
   cancelBtn.content = "  No";
-	cancelBtn.position.left = "50%";
+  cancelBtn.position.left = "50%";
   cancelBtn.position.top += 1;
   cancelBtn.style.fg = "black";
   cancelBtn.style.bg = "white";
   screen.setEffects(cancelBtn, cancelBtn, "focus", "blur", {
     fg: "white",
     bg: "red",
-		bold: true
+    bold: true
   }, "focusEffects", "_ftemp");
 };
 
@@ -90,7 +90,7 @@ ConfirmModal.prototype.ask = function(msg, callback){
 
 ConfirmModal.prototype.__proto__ = Question.prototype;
 
-ConfirmModal.prototype.type = 'confirmmodal';
+ConfirmModal.prototype.type = "confirmmodal";
 
 module.exports = ConfirmModal;
 

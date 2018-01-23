@@ -8,9 +8,9 @@ function listPackages(){
   var cmd = "apt list";
   var options ={};
   // DEBUG
-	if(process.env.NODE_ENV === "ubuntu") {
-		cmd = "apt list z*";
-	}
+  if(process.env.NODE_ENV === "ubuntu") {
+    cmd = "apt list z*";
+  }
   return getCommandOutput(cmd, options).then(function(buf){
     var pkgs = {};
     buf.split(/\n/g).forEach(function(line){

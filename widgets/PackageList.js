@@ -1,6 +1,4 @@
-var child_process = require("child_process");
 var blessed = require("blessed");
-var lodash = require("lodash");
 var Node = blessed.Node;
 var List = blessed.List;
 var ConfirmModal = require("./ConfirmModal");
@@ -16,7 +14,7 @@ function PackageList(options) {
   List.call(this, options);
   this._initConfirmModal();
   this._initCommandDialog();
-	this.bindEvents();
+  this.bindEvents();
   this._readPackages();
 }
 
@@ -44,11 +42,13 @@ PackageList.prototype.bindEvents = function(){
     this.emit("select-package", pkg);
   });
 
-  function onLetterKey(ch, key){
+  function onLetterKey(ch){
     var hit = false;
     var self = this;
     self.ritems.forEach(function(text, index){
-      if(hit) { return; }
+      if(hit) {
+        return;
+      }
       if(text.indexOf(ch) === 0) {
         hit = true;
         self.select(index);
@@ -61,7 +61,7 @@ PackageList.prototype.bindEvents = function(){
         this.select(0);
         break;
       case "end":
-        this.select(textItems ? textItems.length - 1 : 0);
+        this.select(this.ritems.length > 0 ? this.ritems.length - 1 : 0);
         break;
       case "left":
       case "up":
@@ -73,7 +73,7 @@ PackageList.prototype.bindEvents = function(){
         break;
     }
   }
-  function onDownKey(ch, key){
+  function onDownKey(){
     this.down();
   }
   function onUpKey(){
@@ -82,8 +82,7 @@ PackageList.prototype.bindEvents = function(){
   // remove
   function onRemoveKey(){
     var self = this;
-    var package = self.getItem(self.selected);
-    var name = package.content;
+    var name = self.getItem(self.selected).content;
     var msg = "Are you sure you want to remove `" + name + "` ?";
     self.confirm(msg).then(function(result){
       self.focus();
@@ -95,8 +94,7 @@ PackageList.prototype.bindEvents = function(){
   // install
   function onInstallKey(){
     var self = this;
-    var package = self.getItem(self.selected);
-    var name = package.content;
+    var name = self.getItem(self.selected).content;
     var msg = "Are you sure you want to install `" + name + "` ?";
     self.confirm(msg).then(function(result){
       self.focus();
@@ -167,7 +165,7 @@ PackageList.prototype._readPackages = function(){
 
 PackageList.prototype.__proto__ = List.prototype;
 
-PackageList.prototype.type = 'packagelist';
+PackageList.prototype.type = "packagelist";
 
 module.exports = PackageList;
 // vim: set ts=2 sw=2:
