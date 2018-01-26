@@ -118,7 +118,7 @@ PackageList.prototype.installPackage = function(name){
   this.syscall(title, "apt", ["install", name, "-y"], {});
 };
 
-PackageList.prototype.removePackage = function(){
+PackageList.prototype.removePackage = function(name){
   var title = "removing package: " + name 
   this.syscall(title, "apt", ["remove", name, "-y"], {});
 };
