@@ -82,7 +82,6 @@ ExecCommandDialog.prototype.exec = function(cmd, args, options){
   var self = this;
   var quitElement = self._.quit;
   var bodyElement = self._.body;
-  console.log(cmd, args);
   var p = child_process.spawn(cmd, args, options);
   var output = "";
   bodyElement.setContent(output);

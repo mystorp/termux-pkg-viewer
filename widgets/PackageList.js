@@ -3,6 +3,7 @@ var Node = blessed.Node;
 var List = blessed.List;
 var ConfirmModal = require("./ConfirmModal");
 var ExecCommandDialog = require("./ExecCommandDialog");
+var HelpDialog = require("./HelpDialog");
 
 var utils = require("../utils");
 
@@ -14,6 +15,7 @@ function PackageList(options) {
   List.call(this, options);
   this._initConfirmModal();
   this._initCommandDialog();
+  this._initHelp();
   this.bindEvents();
   this._readPackages();
 }
@@ -27,15 +29,17 @@ PackageList.prototype.bindEvents = function(){
     this.key(["S-tab", "S-space"], onUpKey);
     this.key("backspace", onRemoveKey);
     this.key("enter", onInstallKey);
+    this.key("?", onHelp);
   });
   this.on("detach", function(){
-    // bind navigate keys
+    // unbind navigate keys
     this.unkey("abcdefghijklmnopqrstuvwxyz".split(""), onLetterKey);
     this.unkey(["home", "end", "left", "up", "right", "down"], onDirectionKey);
     this.unkey(["tab", "space"], onDownKey);
     this.unkey(["S-tab", "S-space"], onUpKey);
     this.unkey("backspace", onRemoveKey);
     this.unkey("enter", onInstallKey);
+    this.unkey("?", onHelp);
   });
   this.on("select item", function(item){
     var pkg = this.allPackages[item.content];
@@ -103,6 +107,10 @@ PackageList.prototype.bindEvents = function(){
       }
     }, function(){});
   }
+  // show help
+  function onHelp(){
+    this._.helpDialog.help();
+  }
 };
 
 PackageList.prototype.installPackage = function(name){
@@ -130,7 +138,7 @@ PackageList.prototype.confirm = function(msg){
 };
 
 PackageList.prototype.syscall = function(title, cmd, args, options){
-  var dialog = this._.dialog;
+  var dialog = this._.cmdDialog;
   dialog.setLabel(title);
   dialog.exec(cmd, args, options);
   dialog.show();
@@ -144,9 +152,17 @@ PackageList.prototype._initConfirmModal = function(){
 };
 
 PackageList.prototype._initCommandDialog = function(){
-  var dialog = this._.dialog = new ExecCommandDialog({
+  var dialog = this._.cmdDialog = new ExecCommandDialog({
     hidden: true
   });
+  this.screen.append(dialog);
+  dialog.on("hide", function(){
+    this.focus();
+  }.bind(this));
+};
+
+PackageList.prototype._initHelp = function(){
+  var dialog = this._.helpDialog = new HelpDialog();
   this.screen.append(dialog);
   dialog.on("hide", function(){
     this.focus();

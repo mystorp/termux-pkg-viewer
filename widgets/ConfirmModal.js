@@ -13,10 +13,11 @@ function ConfirmModal(options) {
     left: "center",
     border: {type: "line"},
     padding: 1,
+    label: " Confirm ",
     style: {
       shadow: true,
-      fg: "white",
-      bg: "yellow",
+      fg: "yellow",
+      bg: "black",
       border: {
         fg: "yellow"
       }

@@ -9,15 +9,31 @@ function PackageInfo(options) {
     return new PackageInfo(options);
   }
   options = options || {};
+  options.tags = true;
   Element.call(this, options);
 }
 
 PackageInfo.prototype.showPackage = function(pkg){
   var self = this;
+  // TODO: show pkg files
   utils.getPackageInfo(pkg.name).then(function(info){
-    self.setContent(info);
+    info = "Installed: " + !!pkg.installed + "\n" + info;
+    self.setContent(self.formatInfo(info));
     self.screen.render();
   });
+};
+
+PackageInfo.prototype.formatInfo = function(info){
+  var lines = info.trim().split(/\r?\n/g);
+  return lines.map(function(line){
+    var pos = line.indexOf(": ");
+    if(pos === -1) {
+      return line;
+    }
+    var field = line.substring(0, pos);
+    var value = line.substring(pos + 2);
+    return "{bold}" + field + "{/bold}: " + value;
+  }).join("\n");
 };
 
 PackageInfo.prototype.__proto__ = Element.prototype;
