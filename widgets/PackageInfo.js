@@ -1,6 +1,7 @@
 var blessed = require("blessed");
 var Node = blessed.Node;
 var Element = blessed.Element;
+var UIEvents = require("./UIEvents");
 
 var utils = require("../utils");
 
@@ -11,6 +12,7 @@ function PackageInfo(options) {
   options = options || {};
   options.tags = true;
   Element.call(this, options);
+  this.bindEvents();
 }
 
 PackageInfo.prototype.showPackage = function(pkg){
@@ -34,6 +36,16 @@ PackageInfo.prototype.formatInfo = function(info){
     var value = line.substring(pos + 2);
     return "{bold}" + field + "{/bold}: " + value;
   }).join("\n");
+};
+
+PackageInfo.prototype.bindEvents = function(){
+  var onSelectPackage = this.showPackage.bind(this);
+  this.on("attach", function(){
+    UIEvents.on("select-package", onSelectPackage);
+  });
+  this.on("detach", function(){
+    UIEvents.removeListener("select-package", onSelectPackage);
+  });
 };
 
 PackageInfo.prototype.__proto__ = Element.prototype;

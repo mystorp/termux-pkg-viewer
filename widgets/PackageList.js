@@ -4,6 +4,7 @@ var List = blessed.List;
 var ConfirmModal = require("./ConfirmModal");
 var ExecCommandDialog = require("./ExecCommandDialog");
 var HelpDialog = require("./HelpDialog");
+var UIEvents = require("./UIEvents");
 
 var utils = require("../utils");
 
@@ -43,7 +44,7 @@ PackageList.prototype.bindEvents = function(){
   });
   this.on("select item", function(item){
     var pkg = this.allPackages[item.content];
-    this.emit("select-package", pkg);
+    UIEvents.emit("select-package", pkg);
   });
 
   function onLetterKey(ch){

@@ -3,6 +3,7 @@ var blessed = require("blessed");
 var lodash = require("lodash");
 var Node = blessed.Node;
 var Element = blessed.Element;
+var UIEvents = require("./UIEvents");
 
 
 function ExecCommandDialog(options) {
@@ -49,13 +50,6 @@ function ExecCommandDialog(options) {
     scrollable: true
   });
   this.bindEvents();
-  if(options.command) {
-    this.exec(
-      options.command,
-      options.commandArgs,
-      options.commandOptions
-    );
-  }
 }
 
 ExecCommandDialog.prototype.bindEvents = function(){
@@ -74,6 +68,7 @@ ExecCommandDialog.prototype.bindEvents = function(){
   }
   function onQuit(){
     self.hide();
+    UIEvents.emit("hide-cmddialog");
     self.screen.render();
   }
 };
@@ -87,6 +82,7 @@ ExecCommandDialog.prototype.exec = function(cmd, args, options){
   bodyElement.setContent(output);
   p.on("close", function(){
     quitElement.focus();
+    UIEvents.emit("pclose-cmddialog");
     self.screen.render();
   });
   p.stdout.on("data", onData);
@@ -99,6 +95,12 @@ ExecCommandDialog.prototype.exec = function(cmd, args, options){
     bodyElement.setScrollPerc(100);
     self.screen.render();
   }
+};
+
+ExecCommandDialog.prototype.show = function(){
+  var superShow = Element.prototype.show;
+  UIEvents.emit("show-cmddialog");
+  superShow.call(this);
 };
 
 ExecCommandDialog.prototype.__proto__ = Element.prototype;

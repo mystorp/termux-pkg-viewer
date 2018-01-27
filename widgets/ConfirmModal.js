@@ -1,6 +1,7 @@
 var blessed = require("blessed");
 var Node = blessed.Node;
 var Question = blessed.Question;
+var UIEvents = require("./UIEvents");
 var lodash = require("lodash");
 
 function ConfirmModal(options) {
@@ -86,8 +87,15 @@ ConfirmModal.prototype.ask = function(msg, callback){
   this.focus();
   this._.okay.focus();
   this.setIndex(-1);
+  UIEvents.emit("show-modal");
   this.screen.render();
-}
+};
+
+ConfirmModal.prototype.hide = function(){
+  var superHide = Question.prototype.hide;
+  UIEvents.emit("hide-modal");
+  superHide.call(this);
+};
 
 ConfirmModal.prototype.__proto__ = Question.prototype;
 

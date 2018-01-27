@@ -63,10 +63,6 @@ function createUI() {
       bold: true
     }
   });
-  leftui.on("select-package", function(pkg){
-    rightui.showPackage(pkg);
-    bottomui.setPackage(pkg);
-  });
   screen.append(leftui);
   screen.append(rightui);
   screen.append(bottomui);
