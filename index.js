@@ -20,7 +20,7 @@ function createUI() {
     fullUnicode: true,
     title: "termux package viewer"
   });
-  screen.key("C-q", function(){
+  screen.key("S-q", function(ch, keys){
     process.exit(0);
   });
   var leftui = new PackageList({

@@ -22,7 +22,7 @@ function HelpDialog(options) {
     "    install selected package\n",
     "  backspace",
     "    remove selected package\n",
-    "  ctrl + q",
+    "  shift + q",
     "    exit program",
     "{/cyan-fg}"
   ].join("\n");
