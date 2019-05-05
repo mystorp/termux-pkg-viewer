@@ -49,6 +49,9 @@ function! s:ShowPkgInfo()
     let s:lastJob = job_start(["apt", "show", l:name], {"close_cb": function("<SID>ReadChannelData")})
     let s:isJobPending = v:true
 endfunction
+" usage:
+"   pkg list-all > termux.pkg
+"   vim termux.pkg
 autocmd CursorMoved *.pkg call s:ShowPkgInfo()
 
 ```
